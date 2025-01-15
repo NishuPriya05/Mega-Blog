@@ -1,4 +1,4 @@
-import { Signup as SignupComponent } from "../components";
+import { Signup as SignupComponent } from "../Components";
 
 function Signup() {
   return (
