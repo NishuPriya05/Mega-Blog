@@ -23,8 +23,8 @@ function Login() {
       if (session) {
         const userData = await authService.getCurrentUser();
         if (userData) {
-          dispatch(authLogin(userData));
-          navigate("/");
+          dispatch(authLogin({ userData }));
+          navigate("/all-posts");
         } else {
           throw new Error("Failed to retrieve user data.");
         }
@@ -35,28 +35,29 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full">
-      <div
-        className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}
-      >
-        <div className="mb-2 flex justify-center">
-          <span className="inline-block w-full max-w-[100px]">
-            <Logo width="100%" />
+    <div className="flex min-h-[60vh] w-full items-center justify-center px-4 py-10 sm:px-6">
+      <div className="mx-auto w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-[0_12px_40px_-24px_rgba(24,58,53,0.35)] sm:p-8">
+        <div className="mb-6 flex flex-col items-center">
+          <Logo width="52px" />
+          <span className="mt-3 text-lg font-extrabold tracking-tight text-[#183a35]">
+            Mega<span className="text-[#ef7755]">Blog</span>
           </span>
         </div>
-        <h2 className="text-center text-2xl font-bold leading-tight">
+        <h2 className="text-center text-2xl font-bold leading-tight text-[#183a35]">
           Sign in to your account
         </h2>
         <p className="mt-2 text-center text-base text-black/60">
           Don&apos;t have an account?&nbsp;
           <Link
             to="/signup"
-            className="font-medium text-primary transition-all duration-200 hover:underline"
+            className="font-semibold text-[#d75e43] transition-colors hover:text-[#b94d36] hover:underline"
           >
             Sign Up
           </Link>
         </p>
-        {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
+        {error && (
+          <p className="mt-8 text-center text-sm text-red-600">{error}</p>
+        )}
         <form onSubmit={handleSubmit(login)} className="mt-8">
           <div className="space-y-5">
             <Input

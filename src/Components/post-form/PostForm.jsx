@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import appwriteService from "../../appwrite/config";
@@ -18,39 +18,49 @@ export default function PostForm({ post }) {
 
   const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
+  const [submitError, setSubmitError] = useState("");
 
   const submit = async (data) => {
-    if (post) {
-      const file = data.image[0]
-        ? await appwriteService.uploadFile(data.image[0])
-        : null;
+    setSubmitError("");
+    try {
+      if (post) {
+        const file = data.image[0]
+          ? await appwriteService.uploadFile(data.image[0])
+          : null;
 
-      if (file) {
-        appwriteService.deleteFile(post.featuredImage);
-      }
+        if (file) {
+          appwriteService.deleteFile(post.featuredImage);
+        }
 
-      const dbPost = await appwriteService.updatePost(post.$id, {
-        ...data,
-        featuredImage: file ? file.$id : undefined,
-      });
+        const dbPost = await appwriteService.updatePost(post.$id, {
+          ...data,
+          featuredImage: file ? file.$id : undefined,
+        });
 
-      if (dbPost) {
+        if (!dbPost) throw new Error("Unable to update the post.");
         navigate(`/post/${dbPost.$id}`);
-      }
-    } else {
-      const file = await appwriteService.uploadFile(data.image[0]);
-
-      if (file) {
-        const fileId = file.$id;
-        data.featuredImage = fileId;
+      } else {
+        const file = await appwriteService.uploadFile(data.image[0]);
         const dbPost = await appwriteService.createPost({
           ...data,
+          featuredImage: file.$id,
           userId: userData.$id,
         });
 
-        if (dbPost) {
-          navigate(`/post/${dbPost.$id}`);
-        }
+        if (!dbPost) throw new Error("Unable to create the post.");
+        navigate(`/post/${dbPost.$id}`);
+      }
+    } catch (error) {
+      const message = error?.message || "Unable to submit the post.";
+      if (
+        error?.code === 401 &&
+        /No permissions provided for action ['"]create['"]/i.test(message)
+      ) {
+        setSubmitError(
+          "Image upload was denied. In the Appwrite Console, open Storage, select this bucket, and grant the Create permission to authenticated users."
+        );
+      } else {
+        setSubmitError(message);
       }
     }
   };
@@ -77,8 +87,11 @@ export default function PostForm({ post }) {
   }, [watch, slugTransform, setValue]);
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-      <div className="w-2/3 px-2">
+    <form
+      onSubmit={handleSubmit(submit)}
+      className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)]"
+    >
+      <div className="min-w-0 space-y-4">
         <Input
           label="Title :"
           placeholder="Title"
@@ -103,7 +116,7 @@ export default function PostForm({ post }) {
           defaultValue={getValues("content")}
         />
       </div>
-      <div className="w-1/3 px-2">
+      <div className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
         <Input
           label="Featured Image :"
           type="file"
@@ -114,7 +127,7 @@ export default function PostForm({ post }) {
         {post && (
           <div className="w-full mb-4">
             <img
-              src={appwriteService.getFilePreview(post.featuredImage)}
+              src={appwriteService.getFileView(post.featuredImage)}
               alt={post.title}
               className="rounded-lg"
             />
@@ -126,6 +139,11 @@ export default function PostForm({ post }) {
           className="mb-4"
           {...register("status", { required: true })}
         />
+        {submitError && (
+          <p className="text-sm text-red-600" role="alert">
+            {submitError}
+          </p>
+        )}
         <Button
           type="submit"
           bgColor={post ? "bg-green-500" : undefined}

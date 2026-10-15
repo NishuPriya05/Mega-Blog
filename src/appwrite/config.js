@@ -102,7 +102,7 @@ export class Service {
       );
     } catch (error) {
       console.log("Appwrite serive :: uploadFile :: error", error);
-      return false;
+      throw error;
     }
   }
 
@@ -116,8 +116,8 @@ export class Service {
     }
   }
 
-  getFilePreview(fileId) {
-    return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
+  getFileView(fileId) {
+    return this.bucket.getFileView(conf.appwriteBucketId, fileId);
   }
 }
 

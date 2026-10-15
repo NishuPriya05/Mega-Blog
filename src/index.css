@@ -1,3 +1,77 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  color-scheme: light;
+  --brand-ink: #183a35;
+  --brand-accent: #ef7755;
+  --brand-paper: #f7f8f5;
+}
+
+body {
+  @apply text-slate-900 antialiased;
+  min-width: 320px;
+  margin: 0;
+  background: var(--brand-paper);
+  font-family: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgb(239 119 85 / 45%);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar for modern browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-50;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-full transition-colors;
+  background: #cbd5d0;
+}
+
+/* Fix Rich Text Output typography leaks */
+.prose-custom h1,
+.prose-custom h2,
+.prose-custom h3 {
+  @apply text-slate-900 font-bold tracking-tight mt-6 mb-4;
+}
+.prose-custom h1 {
+  @apply text-3xl;
+}
+.prose-custom h2 {
+  @apply text-2xl;
+}
+.prose-custom p {
+  @apply text-slate-600 leading-relaxed mb-4 text-[17px];
+}
+.prose-custom img {
+  @apply rounded-xl my-6 shadow-sm border border-slate-100 max-w-full h-auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -21,14 +21,14 @@ function App() {
         }
       })
       .finally(() => setLoading(false));
-  }, []);
+  }, [dispatch]);
 
   return !loading ? (
-    <div className="min-h-screen flex flex-wrap content-between bg-gray-400">
-      <div className="w-full block">
+    <div className="flex min-h-screen flex-col bg-[#f7f8f5]">
+      <div className="flex min-h-screen w-full flex-col">
         <Header />
-        <main>
-          TODO: <Outlet />
+        <main className="flex-1">
+          <Outlet />
         </main>
         <Footer />
       </div>
